@@ -176,8 +176,19 @@ class Splitter:
         Image.fromarray(data.astype("uint16")).save(filename)
 
     def _write_preview(self, filename, data):
-        drange = data.max()-data.min()
-        preview_data = 255.0*((data-data.min())/drange)
+        lower_bound = data.min()
+        upper_bound = data.max()
+
+        k = 273.15
+
+        lower_bound = (20 + k)/0.04 # 5 degree celsius
+        upper_bound = (60 + k)/0.04
+        data = nump.clip(data, lower_bound, upper_bound)
+
+        drange = upper_bound - lower_bound
+
+        preview_data = 255.0*((data-lower_bound)/drange)
+
         logger.debug("Writing {}", filename)
         Image.fromarray(preview_data.astype('uint8')).save(filename)
             
